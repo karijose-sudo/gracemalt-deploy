@@ -24,11 +24,13 @@ def home():
 def predict(data: dict):
     df = pd.DataFrame([data])
     preds = predict_quality(df)
-    return {"prediction": preds.tolist()}  # ensure JSON serializable
+    return {"prediction": preds}  # preds is already a list
+
 
 # --- Run the app on the port provided by Render ---
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 8000))
     uvicorn.run(app, host="0.0.0.0", port=port)
+
 
 
