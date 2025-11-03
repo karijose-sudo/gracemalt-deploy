@@ -1,6 +1,7 @@
 import streamlit as st
 import pickle
 import numpy as np
+import os
 import pandas as pd
 
 # Load your trained model
@@ -90,3 +91,4 @@ if st.button("Predict Friability"):
         st.success(f"Predicted Friability: **{prediction[0]:.2f}**")
     except Exception as e:
         st.error(f"An error occurred: {e}")
+
