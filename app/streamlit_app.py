@@ -62,16 +62,16 @@ with st.expander("Steeping Parameters", expanded=False):
     col3, col4 = st.columns(2)
     with col3:
         user_input['first wet phase'] = st.number_input('First wet phase', 0.0, 20.0, 6.0)
-        user_input['first dry phase'] = st.number_input('First dry phase', 0.0, 20.0, 4.0)
+        user_input['first dry phase'] = st.number_input('First dry phase', 0.0, 25.0, 4.0)
         user_input['second wet phase'] = st.number_input('Second wet phase', 0.0, 20.0, 5.5)
         user_input['second dry phase'] = st.number_input('Second dry phase', 0.0, 20.0, 3.5)
-        user_input['Steeping Duration'] = st.number_input('Steeping Duration', 0.0, 24.0, 12.5)
+        user_input['Steeping Duration'] = st.number_input('Steeping Duration', 0.0, 50.0, 12.5)
     with col4:
         user_input['1st wet steep water temp '] = st.number_input('1st wet steep water temp', 0.0, 100.0, 18.0)
         user_input['2nd wet water temp  '] = st.number_input('2nd wet water temp', 0.0, 100.0, 20.0)
         user_input['End of Steep Mositure  Content '] = st.number_input('End of Steep Moisture Content', 0.0, 50.0, 42.0)
-        user_input['Hydration Index based on 50 Grains '] = st.number_input('Hydration Index (50 Grains)', 0.0, 5.0, 0.8)
-        user_input['End of steep Chit Count)'] = st.number_input('End of Steep Chit Count', 0.0, 50.0, 25.0)
+        user_input['Hydration Index based on 50 Grains '] = st.number_input('Hydration Index (50 Grains)', 0.0, 100.0, 0.8)
+        user_input['End of steep Chit Count)'] = st.number_input('End of Steep Chit Count', 0.0, 100.0, 25.0)
 
 # -----------------------------
 # Germination Section
@@ -80,14 +80,14 @@ with st.expander("Germination Parameters", expanded=False):
     col5, col6 = st.columns(2)
     with col5:
         user_input['MC after  48 Hours Post casting  - (GBK)'] = st.number_input('MC after 48 Hours Post Casting', 0.0, 50.0, 15.0)
-        user_input['Chit Count  48hrs Post casting (GBK)'] = st.number_input('Chit Count 48hrs', 0.0, 50.0, 10.0)
-        user_input['Chit count   72hrs'] = st.number_input('Chit count 72hrs', 0.0, 50.0, 8.0)
+        user_input['Chit Count  48hrs Post casting (GBK)'] = st.number_input('Chit Count 48hrs', 0.0, 100.0, 10.0)
+        user_input['Chit count   72hrs'] = st.number_input('Chit count 72hrs', 0.0, 100.0, 8.0)
         user_input['MC after 72hrs Post casting'] = st.number_input('MC after 72hrs Post Casting', 0.0, 50.0, 16.0)
         user_input['Chit Count  120hrs Post casting (Non GrwOn)-  GBK'] = st.number_input('Chit Count 120hrs Non GrwOn', 0.0, 50.0, 5.0)
     with col6:
         user_input['Chit Count  120hrs Post casting (1/4 to 1/2)-  GBK'] = st.number_input('Chit Count 120hrs 1/4 to 1/2', 0.0, 50.0, 7.0)
         user_input['Chit Count  120hrs Post casting (1/2 to 3/4)-  GBK'] = st.number_input('Chit Count 120hrs 1/2 to 3/4', 0.0, 50.0, 9.0)
-        user_input['Chit Count  120hrs Post casting (3/4 to Full (F) in GBK'] = st.number_input('Chit Count 120hrs 3/4 to Full', 0.0, 50.0, 12.0)
+        user_input['Chit Count  120hrs Post casting (3/4 to Full (F) in GBK'] = st.number_input('Chit Count 120hrs 3/4 to Full', 0.0, 100.0, 12.0)
         user_input['Chit Count  120hrs Post casting (Full Plus F+) in GBK'] = st.number_input('Chit Count 120hrs Full Plus F+', 0.0, 50.0, 14.0)
         user_input['End of germination  Moisture '] = st.number_input('End of Germination Moisture', 0.0, 50.0, 38.0)
 
@@ -101,5 +101,6 @@ if st.button("Predict Friability"):
         st.success(f"Predicted Malt Friability: {prediction[0]:.2f}")
     except Exception as e:
         st.error(f"An error occurred during prediction: {e}")
+
 
 
