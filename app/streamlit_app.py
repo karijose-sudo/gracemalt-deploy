@@ -47,7 +47,7 @@ with st.expander("Pre-Steep Parameters", expanded=True):
         user_input['Germination Capacity'] = st.number_input('Germination Capacity', 0.0, 100.0, 98.0)
         user_input['Germination Energy '] = st.number_input('Germination Energy', 0.0, 100.0, 90.0)
         user_input['Germination Energy 8mls'] = st.number_input('Germination Energy 8mls', 0.0, 100.0, 85.0)
-        user_input['water Sensity '] = st.number_input('Water Sensity', 0.0, 10.0, 1.2)
+        user_input['water Sensity '] = st.number_input('Water Sensity', 0.0, 90.0, 1.2)
     with col2:
         user_input['Screens - eaml'] = st.number_input('Screens - eaml', 0.0, 10.0, 2.0)
         user_input['1000 corn Weight *c wgt'] = st.number_input('1000 corn Weight *c wgt', 0.0, 100.0, 35.0)
@@ -101,4 +101,5 @@ if st.button("Predict Friability"):
         st.success(f"Predicted Malt Friability: {prediction[0]:.2f}")
     except Exception as e:
         st.error(f"An error occurred during prediction: {e}")
+
 
