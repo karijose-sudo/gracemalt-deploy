@@ -5,7 +5,7 @@ import joblib
 # -----------------------------
 # Load the trained model
 # -----------------------------
-model = joblib.load('gracemalt_model.pkl')
+model = joblib.load("models/gracemalt_model.pkl")
 
 # -----------------------------
 # Feature names (must match training)
@@ -101,3 +101,4 @@ if st.button("Predict Friability"):
         st.success(f"Predicted Malt Friability: {prediction[0]:.2f}")
     except Exception as e:
         st.error(f"An error occurred during prediction: {e}")
+
