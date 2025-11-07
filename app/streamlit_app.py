@@ -79,8 +79,8 @@ with st.expander("Derived Germination Dynamics", expanded=False):
     with col6:
         user_input['Uniformity_Chit'] = st.number_input('Uniformity (Chit)', 0.0, 10.0, 1.0)
         user_input['Chit_CV'] = st.number_input('Chit CV (%)', 0.0, 50.0, 5.0)
-        user_input['Efficiency_48_72'] = st.number_input('Efficiency 48–72', 0.0, 100.0, 85.0)
-        user_input['Efficiency_72_120'] = st.number_input('Efficiency 72–120', 0.0, 100.0, 88.0)
+        user_input['Efficiency_48_72'] = st.number_input('Efficiency 48–72', -10.0, 100.0, 85.0)
+        user_input['Efficiency_72_120'] = st.number_input('Efficiency 72–120', -10.0, 100.0, 88.0)
 
 # -----------------------------
 # Predict Button
@@ -96,3 +96,4 @@ if st.button("Predict Friability"):
 
 
         
+
