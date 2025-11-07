@@ -93,30 +93,6 @@ if st.button("Predict Friability"):
     except Exception as e:
         st.error(f"An error occurred during prediction: {e}")
 
-# -----------------------------
-# Header with hidden 🌾 Easter egg
-# -----------------------------
-col1, col2, col3 = st.columns([1, 3, 1])
-with col2:
-    title_col1, title_col2 = st.columns([0.1, 0.9])
-    with title_col1:
-        if "click_count" not in st.session_state:
-            st.session_state.click_count = 0
 
-        if st.button("🌾", key="secret_button", help=""):
-            st.session_state.click_count += 1
 
-        messages = [
-            "Achievement unlocked: You clicked something you weren’t supposed to.",
-            "You’re still here?",
-            "Stop. Touching. The. Brain.",
-            "At this point, I’m calling HR.",
-            "Okay fine — you win. I give up. Happy now?",
-        ]
-
-        if st.session_state.click_count > 0:
-            msg_index = min(st.session_state.click_count, len(messages)) - 1
-            st.warning(messages[msg_index])
-
-        if st.session_state.click_count == 7:
-            st.balloons()
+        
