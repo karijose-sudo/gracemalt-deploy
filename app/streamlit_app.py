@@ -94,31 +94,29 @@ if st.button("Predict Friability"):
         st.error(f"An error occurred during prediction: {e}")
 
 # -----------------------------
-# Easter Egg Section
+# Header with hidden 🌾 Easter egg
 # -----------------------------
-st.markdown("---")
-st.markdown("### 🧩 Secret Mode")
+col1, col2, col3 = st.columns([1, 3, 1])
+with col2:
+    title_col1, title_col2 = st.columns([0.1, 0.9])
+    with title_col1:
+        if "click_count" not in st.session_state:
+            st.session_state.click_count = 0
 
-if "click_count" not in st.session_state:
-    st.session_state.click_count = 0
+        if st.button("🌾", key="secret_button", help=""):
+            st.session_state.click_count += 1
 
-if st.button("🧠 Reveal Secret"):
-    with st.spinner("Consulting the algorithm..."):
-        time.sleep(0.7)
-    st.session_state.click_count += 1
+        messages = [
+            "Achievement unlocked: You clicked something you weren’t supposed to.",
+            "You’re still here?",
+            "Stop. Touching. The. Brain.",
+            "At this point, I’m calling HR.",
+            "Okay fine — you win. I give up. Happy now?",
+        ]
 
-messages = [
-    "Achievement unlocked: You clicked something you weren’t supposed to.",
-    "You’re still here?",
-    "Stop. Touching. The. Brain.",
-    "At this point, I’m calling HR.",
-    "Okay fine — you win. I give up. Happy now?",
-]
+        if st.session_state.click_count > 0:
+            msg_index = min(st.session_state.click_count, len(messages)) - 1
+            st.warning(messages[msg_index])
 
-if st.session_state.click_count > 0:
-    msg_index = min(st.session_state.click_count, len(messages)) - 1
-    st.warning(messages[msg_index])
-
-if st.session_state.click_count == 7:
-    st.balloons()
-    st.success("🍻 Cheers! May your malt always germinate at 98% and your friability stay strong!")
+        if st.session_state.click_count == 7:
+            st.balloons()
