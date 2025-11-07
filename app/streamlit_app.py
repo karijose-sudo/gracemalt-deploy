@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 import joblib
+import time
 
 # -----------------------------
 # Load the trained model
@@ -15,16 +16,23 @@ columns = [
     'Grain Germinatio %', 'Germination Capacity', 'Germination Energy ', 'Germination Energy 8mls',
     'water Sensity ', 'Screens - eaml', '1000 corn Weight *c wgt', 'Grain Nitrogen % N2',
     'Rubbish %', 'Moisture Content',
+
     # Steeping
     'first wet phase', 'first dry phase', 'second wet phase', 'second dry phase', 'Steeping Duration',
     '1st wet steep water temp ', '2nd wet water temp  ', 'End of Steep Mositure  Content ',
     'Hydration Index based on 50 Grains ', 'End of steep Chit Count)',
+
     # Germination
     'MC after  48 Hours Post casting  - (GBK)', 'Chit Count  48hrs Post casting (GBK)', 'Chit count   72hrs',
     'MC after 72hrs Post casting', 'Chit Count  120hrs Post casting (Non GrwOn)-  GBK',
     'Chit Count  120hrs Post casting (1/4 to 1/2)-  GBK', 'Chit Count  120hrs Post casting (1/2 to 3/4)-  GBK',
     'Chit Count  120hrs Post casting (3/4 to Full (F) in GBK', 'Chit Count  120hrs Post casting (Full Plus F+) in GBK',
-    'End of germination  Moisture '
+    'End of germination  Moisture ',
+
+    # Derived germination dynamics
+    'ΔMC_48_72', 'ΔMC_72_120', 'Uniformity_MC',
+    'ΔChit_48_72', 'ΔChit_72_120', 'Uniformity_Chit',
+    'Chit_CV', 'Efficiency_48_72', 'Efficiency_72_120'
 ]
 
 # -----------------------------
@@ -92,6 +100,23 @@ with st.expander("Germination Parameters", expanded=False):
         user_input['End of germination  Moisture '] = st.number_input('End of Germination Moisture', 0.0, 50.0, 38.0)
 
 # -----------------------------
+# Derived Germination Dynamics
+# -----------------------------
+with st.expander("Derived Germination Dynamics", expanded=False):
+    col7, col8 = st.columns(2)
+    with col7:
+        user_input['ΔMC_48_72'] = st.number_input('ΔMC 48–72', 0.0, 50.0, 1.0)
+        user_input['ΔMC_72_120'] = st.number_input('ΔMC 72–120', 0.0, 50.0, 1.0)
+        user_input['Uniformity_MC'] = st.number_input('Uniformity MC', 0.0, 10.0, 1.0)
+        user_input['ΔChit_48_72'] = st.number_input('ΔChit 48–72', 0.0, 50.0, 1.0)
+        user_input['ΔChit_72_120'] = st.number_input('ΔChit 72–120', 0.0, 50.0, 1.0)
+    with col8:
+        user_input['Uniformity_Chit'] = st.number_input('Uniformity Chit', 0.0, 10.0, 1.0)
+        user_input['Chit_CV'] = st.number_input('Chit CV', 0.0, 10.0, 1.0)
+        user_input['Efficiency_48_72'] = st.number_input('Efficiency 48–72', 0.0, 100.0, 90.0)
+        user_input['Efficiency_72_120'] = st.number_input('Efficiency 72–120', 0.0, 100.0, 85.0)
+
+# -----------------------------
 # Predict Button with Error Handling
 # -----------------------------
 if st.button("Predict Friability"):
@@ -102,5 +127,31 @@ if st.button("Predict Friability"):
     except Exception as e:
         st.error(f"An error occurred during prediction: {e}")
 
+# -----------------------------
+# Easter Egg: Secret Mode
+# -----------------------------
+st.markdown("### 🧩 Secret Mode")
 
+if "click_count" not in st.session_state:
+    st.session_state.click_count = 0
 
+if st.button("🧠"):
+    with st.spinner("Consulting the algorithm..."):
+        time.sleep(0.8)
+    st.session_state.click_count += 1
+
+messages = [
+    "Achievement unlocked: You clicked something you weren’t supposed to.",
+    "You’re still here?",
+    "Alright... you clearly have too much time.",
+    "Stop. Touching. The. Brain.",
+    "At this point, I’m calling HR.",
+    "Okay fine — you win. I give up. Happy now?",
+]
+
+if st.session_state.click_count > 0:
+    msg_index = min(st.session_state.click_count, len(messages)) - 1
+    st.warning(messages[msg_index])
+
+if st.session_state.click_count == 7:
+    st.balloons()
