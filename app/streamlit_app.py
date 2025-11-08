@@ -22,7 +22,7 @@ columns = [
     'End of steep Chit Count)',
     'ΔMC_48_72', 'ΔMC_72_120', 'Uniformity_MC',
     'ΔChit_48_72', 'ΔChit_72_120', 'Uniformity_Chit',
-    'Efficiency_48_72', 'Efficiency_72_120'
+    'Chit_CV', 'Efficiency_48_72', 'Efficiency_72_120'
 ]
 
 # -----------------------------
@@ -97,6 +97,7 @@ chit_list = [chit_48, chit_72, chit_120]
 
 user_input['Uniformity_MC'] = (pd.Series(mc_list).std() / pd.Series(mc_list).mean()) * 100
 user_input['Uniformity_Chit'] = (pd.Series(chit_list).std() / pd.Series(chit_list).mean()) * 100
+user_input['Chit_CV'] = (pd.Series(chit_list).std() / pd.Series(chit_list).mean()) * 100
 user_input['Efficiency_48_72'] = user_input['ΔChit_48_72'] / user_input['ΔMC_48_72'] if user_input['ΔMC_48_72'] != 0 else 0
 user_input['Efficiency_72_120'] = user_input['ΔChit_72_120'] / user_input['ΔMC_72_120'] if user_input['ΔMC_72_120'] != 0 else 0
 
@@ -109,6 +110,7 @@ st.write({
     'ΔChit 72–120 (%)': user_input['ΔChit_72_120'],
     'Uniformity (Moisture)': user_input['Uniformity_MC'],
     'Uniformity (Chit)': user_input['Uniformity_Chit'],
+    'Chit CV (%)': user_input['Chit_CV'],
     'Efficiency 48–72': user_input['Efficiency_48_72'],
     'Efficiency 72–120': user_input['Efficiency_72_120']
 })
