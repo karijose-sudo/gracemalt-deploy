@@ -1,36 +1,53 @@
 import streamlit as st
 import pandas as pd
 import joblib
+import numpy as np
 
 # -----------------------------
-# Load the trained model
+# Load model and training columns
 # -----------------------------
-model = joblib.load("models/ensemble_gracemalt.pkl")
+ensemble = joblib.load("models/ensemble_gracemalt.pkl")
+train_columns = joblib.load("models/train_columns.pkl")
 
 # -----------------------------
-# Feature names (match training)
+# Preprocessing function (same as training)
 # -----------------------------
-columns = [
-    'Grain Germinatio %', 'Germination Capacity', 'Germination Energy ',
-    'Germination Energy 8mls', 'water Sensity ', 'Screens - eaml',
-    '1000 corn Weight *c wgt', 'Grain Nitrogen % N2', 'Rubbish %',
-    'Moisture Content', 'first wet phase', 'first dry phase',
-    'second wet phase', 'second dry phase', 'Steeping Duration',
-    '1st wet steep water temp ', '2nd wet water temp  ',
-    'End of Steep Mositure  Content ', 'Hydration Index based on 50 Grains ',
-    'End of steep Chit Count)',
-    'ΔMC_48_72', 'ΔMC_72_120', 'Uniformity_MC',
-    'ΔChit_48_72', 'ΔChit_72_120', 'Uniformity_Chit',
-    'Chit_CV', 'Efficiency_48_72', 'Efficiency_72_120'
-]
+def preprocess_germination(df):
+    df = df.copy()
+    # Correct 120h chit count
+    df["ChitCount_120"] = 100 - df["Chit Count  120hrs Post casting (Non GrwOn)-  GBK"]
+    # Δ moisture
+    df["ΔMC_48_72"] = df["MC after 72hrs Post casting"] - df["MC after  48 Hours Post casting  - (GBK)"]
+    df["ΔMC_72_120"] = df["End of germination  Moisture "] - df["MC after 72hrs Post casting"]
+    # Δ chit counts
+    df["ΔChit_48_72"] = df["Chit count   72hrs"] - df["Chit Count  48hrs Post casting (GBK)"]
+    df["ΔChit_72_120"] = df["ChitCount_120"] - df["Chit count   72hrs"]
+    # Uniformity
+    df["Uniformity_MC"] = df["ΔMC_72_120"] / df["ΔMC_48_72"].replace(0, np.nan)
+    df["Uniformity_Chit"] = df["ΔChit_72_120"] / df["ΔChit_48_72"].replace(0, np.nan)
+    # Coefficient of variation
+    chit_cols = ["Chit Count  48hrs Post casting (GBK)", "Chit count   72hrs", "ChitCount_120"]
+    df["Chit_CV"] = df[chit_cols].std(axis=1) / df[chit_cols].mean(axis=1) * 100
+    # Efficiency
+    df["Efficiency_48_72"] = df["ΔChit_48_72"] / df["ΔMC_48_72"].replace(0, np.nan)
+    df["Efficiency_72_120"] = df["ΔChit_72_120"] / df["ΔMC_72_120"].replace(0, np.nan)
+    # Drop raw columns no longer needed
+    df = df.drop(columns=chit_cols + [
+        "MC after  48 Hours Post casting  - (GBK)",
+        "MC after 72hrs Post casting",
+        "End of germination  Moisture "
+    ])
+    df = df.fillna(df.median())
+    return df
 
 # -----------------------------
-# Streamlit UI
+# Streamlit UI with Accordion
 # -----------------------------
 st.set_page_config(page_title="Malt Friability Predictor", layout="centered")
 st.title("🌾 Malt Friability Predictor")
 st.markdown("Enter process parameters below to predict **Friability**")
 
+# Collect user input
 user_input = {}
 
 # --- Pre-Steep ---
@@ -41,7 +58,6 @@ with st.expander("Pre-Steep Parameters", expanded=True):
         user_input['Germination Capacity'] = st.number_input('Germination Capacity', 0.0, 100.0, 99.0)
         user_input['Germination Energy '] = st.number_input('Germination Energy', 0.0, 100.0, 96.0)
         user_input['Germination Energy 8mls'] = st.number_input('Germination Energy 8mls', 0.0, 100.0, 92.0)
-        # Auto-calculate water sensitivity
         user_input['water Sensity '] = user_input['Germination Energy '] - user_input['Germination Energy 8mls']
         st.text(f"Calculated Water Sensitivity: {user_input['water Sensity ']:.2f}")
     with col2:
@@ -59,7 +75,6 @@ with st.expander("Steeping Parameters", expanded=False):
         user_input['first dry phase'] = st.number_input('First dry phase (hrs)', 0.0, 25.0, 4.0)
         user_input['second wet phase'] = st.number_input('Second wet phase (hrs)', 0.0, 20.0, 5.5)
         user_input['second dry phase'] = st.number_input('Second dry phase (hrs)', 0.0, 20.0, 3.5)
-        # Total steeping duration
         user_input['Steeping Duration'] = (
             user_input['first wet phase'] + user_input['first dry phase'] +
             user_input['second wet phase'] + user_input['second dry phase']
@@ -72,67 +87,28 @@ with st.expander("Steeping Parameters", expanded=False):
         user_input['Hydration Index based on 50 Grains '] = st.number_input('Hydration Index (50 Grains)', 0.0, 100.0, 0.9)
         user_input['End of steep Chit Count)'] = st.number_input('End of Steep Chit Count (%)', 0.0, 100.0, 28.0)
 
-# --- Germination Inputs ---
+# --- Germination ---
 with st.expander("Germination Measurements", expanded=False):
     col5, col6 = st.columns(2)
     with col5:
-        mc_48 = st.number_input('MC 48 hrs (%)', 0.0, 100.0, 43.0)
-        mc_72 = st.number_input('MC 72 hrs (%)', 0.0, 100.0, 41.8)
-        mc_120 = st.number_input('MC 120 hrs (%)', 0.0, 100.0, 37.8)
+        user_input['MC after  48 Hours Post casting  - (GBK)'] = st.number_input('MC 48 hrs (%)', 0.0, 100.0, 43.0)
+        user_input['MC after 72hrs Post casting'] = st.number_input('MC 72 hrs (%)', 0.0, 100.0, 41.8)
+        user_input['End of germination  Moisture '] = st.number_input('MC 120 hrs (%)', 0.0, 100.0, 37.8)
     with col6:
-        chit_48 = st.number_input('Chit Count 48 hrs (%)', 0.0, 100.0, 95.0)
-        chit_72 = st.number_input('Chit Count 72 hrs (%)', 0.0, 100.0, 97.0)
-        chit_120 = st.number_input('Chit Count 120 hrs (%)', 0.0, 100.0, 98.0)
+        user_input['Chit Count  48hrs Post casting (GBK)'] = st.number_input('Chit 48 hrs (%)', 0.0, 100.0, 95.0)
+        user_input['Chit count   72hrs'] = st.number_input('Chit 72 hrs (%)', 0.0, 100.0, 97.0)
+        user_input['Chit Count  120hrs Post casting (Non GrwOn)-  GBK'] = st.number_input('Chit 120 hrs (%)', 0.0, 100.0, 98.0)
 
-# --- Compute derived germination dynamics exactly as in preprocessing ---
-chit_120_corrected = 100 - chit_120  # match training preprocessing
+# -----------------------------
+# Preprocess and align input
+# -----------------------------
+input_df = pd.DataFrame([user_input])
+input_df = preprocess_germination(input_df)
+input_df = input_df[train_columns]
 
-ΔMC_48_72 = mc_72 - mc_48
-ΔMC_72_120 = mc_120 - mc_72
-
-ΔChit_48_72 = chit_72 - chit_48
-ΔChit_72_120 = chit_120_corrected - chit_72
-
-Uniformity_MC = ΔMC_72_120 / ΔMC_48_72 if ΔMC_48_72 != 0 else 0
-Uniformity_Chit = ΔChit_72_120 / ΔChit_48_72 if ΔChit_48_72 != 0 else 0
-
-chit_list = [chit_48, chit_72, chit_120_corrected]
-Chit_CV = (pd.Series(chit_list).std() / pd.Series(chit_list).mean()) * 100
-
-Efficiency_48_72 = ΔChit_48_72 / ΔMC_48_72 if ΔMC_48_72 != 0 else 0
-Efficiency_72_120 = ΔChit_72_120 / ΔMC_72_120 if ΔMC_72_120 != 0 else 0
-
-user_input.update({
-    'ΔMC_48_72': ΔMC_48_72,
-    'ΔMC_72_120': ΔMC_72_120,
-    'ΔChit_48_72': ΔChit_48_72,
-    'ΔChit_72_120': ΔChit_72_120,
-    'Uniformity_MC': Uniformity_MC,
-    'Uniformity_Chit': Uniformity_Chit,
-    'Chit_CV': Chit_CV,
-    'Efficiency_48_72': Efficiency_48_72,
-    'Efficiency_72_120': Efficiency_72_120
-})
-
-# Display calculated features
-st.subheader("Calculated Derived Germination Dynamics")
-st.write({
-    'ΔMC 48–72 (%)': ΔMC_48_72,
-    'ΔMC 72–120 (%)': ΔMC_72_120,
-    'ΔChit 48–72 (%)': ΔChit_48_72,
-    'ΔChit 72–120 (%)': ΔChit_72_120,
-    'Uniformity (Moisture)': Uniformity_MC,
-    'Uniformity (Chit)': Uniformity_Chit,
-    'Chit CV (%)': Chit_CV,
-    'Efficiency 48–72': Efficiency_48_72,
-    'Efficiency 72–120': Efficiency_72_120
-})
-
-# --- Predict Button ---
+# -----------------------------
+# Predict Friability
+# -----------------------------
 if st.button("Predict Friability"):
-    try:
-        input_df = pd.DataFrame([user_input], columns=columns)
-        prediction = model.predict(input_df)
-        st.success(f"Predicted Malt Friability: **{prediction[0]:.2f}**")
-    except Exception as e:
-        st.error(f"An error occurred during prediction: {e}")
+    prediction = ensemble.predict(input_df)
+    st.success(f"Predicted Malt Friability: {prediction[0]:.2f}")
