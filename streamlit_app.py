@@ -5,7 +5,7 @@ import joblib
 # Load trained model
 model = joblib.load("models/ensemble_gracemalt_raw.pkl")
 
-# Feature names
+# Feature names (raw features only)
 columns = [
     'Grain Germinatio %', 'Germination Capacity', 'Germination Energy ',
     'Germination Energy 8mls', 'water Sensity ', 'Screens - eaml',
