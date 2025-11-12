@@ -7,6 +7,4 @@ streamlit
 numpy
 requests
 xgboost
-
-
-
+openpyxl
