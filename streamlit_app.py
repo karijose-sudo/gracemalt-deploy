@@ -25,21 +25,11 @@ uploaded_file = st.file_uploader("Upload CSV or Excel file for batch prediction"
 
 if uploaded_file is not None:
     try:
-        # Read file
         if uploaded_file.name.endswith(".csv"):
             df = pd.read_csv(uploaded_file)
         else:
             df = pd.read_excel(uploaded_file)
-
-        # 🧹 Clean column names before further processing
-        df.columns = (
-            df.columns
-            .str.strip()           # Remove leading/trailing spaces
-            .str.strip("'")        # Remove stray apostrophes
-            .str.replace(" ", "_") # Replace spaces with underscores
-            .str.lower()           # Convert to lowercase (optional but consistent)
-        )
-
+        
         st.write("✅ File uploaded successfully.")
         st.write("Preview of uploaded data:")
         st.dataframe(df.head())
@@ -66,8 +56,6 @@ if uploaded_file is not None:
         st.error(f"An error occurred while processing the file: {e}")
 
 else:
-    st.info("Please upload a CSV or Excel file to begin batch predictions.")
-
     # -----------------------------
     # Manual single batch input
     # -----------------------------
@@ -119,4 +107,3 @@ else:
             st.success(f"Predicted Malt Friability: **{prediction[0]:.2f}**")
         except Exception as e:
             st.error(f"An error occurred during prediction: {e}")
-
