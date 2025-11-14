@@ -115,7 +115,14 @@ with st.expander("Germination Features", expanded=False):
 # -----------------------------
 if st.button("Predict Friability"):
     try:
+        # Build DataFrame
         input_df = pd.DataFrame([inputs], columns=columns)
+
+        # Ensure numeric and fill any NaNs
+        input_df = input_df.apply(pd.to_numeric, errors='coerce')
+        input_df = input_df.fillna(input_df.mean())  # fill missing values with column mean
+
+        # Predict
         prediction = model.predict(input_df)
         st.success(f"Predicted Malt Friability: **{prediction[0]:.2f}**")
     except Exception as e:
