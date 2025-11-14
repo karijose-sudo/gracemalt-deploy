@@ -1,4 +1,4 @@
-import streamlit as st
+import streamlit as st 
 import pandas as pd
 import joblib
 
@@ -21,14 +21,15 @@ st.write("Enter your malt batch parameters below to predict **friability**.")
 # -----------------------------
 pre_steep_features = [
     'Grain Germinatio %', 'Germination Capacity', 'Germination Energy ',
-    'Germination Energy 8mls', 'water Sensity ', 'Screens - eaml',
+    'Germination Energy 8mls', 'Screens - eaml',
     '1000 corn Weight *c wgt', 'Grain Nitrogen % N2', 'Rubbish %',
-    'Moisture Content'
+    'Moisture Content', 'water Sensity '  # ← moved here
 ]
 
 steeping_features = [
     'first wet phase', 'first dry phase', 'second wet phase', 'second dry phase',
-    'Steeping Duration', '1st wet steep water temp ', '2nd wet water temp  ',
+    'Steeping Duration',  # ← stays here
+    '1st wet steep water temp ', '2nd wet water temp  ',
     'End of Steep Mositure  Content ', 'Hydration Index based on 50 Grains ',
     'End of steep Chit Count)'
 ]
@@ -53,21 +54,34 @@ with st.expander("Pre-Steep Features", expanded=True):
     cols = st.columns(2)
     for i, feat in enumerate(pre_steep_features):
         with cols[i % 2]:
-            # leave 'water Sensity' for later (auto-calculated)
-            if feat != 'water Sensity ':
+            if feat not in ['water Sensity ']:
                 inputs[feat] = st.number_input(f"{feat}", value=0.0)
+
+    # Auto-calculate water sensity INSIDE the Pre-Steep section
+    inputs['water Sensity '] = (
+        inputs.get('Germination Energy ', 0)
+        - inputs.get('Germination Energy 8mls', 0)
+    )
+
+    with st.columns(2)[0]:
+        st.number_input(
+            "water Sensity (calculated)",
+            value=float(inputs['water Sensity ']),
+            disabled=True
+        )
 
 # -----------------------------
 # Steeping Section
 # -----------------------------
 with st.expander("Steeping Features", expanded=False):
     cols = st.columns(2)
-    # Input first four phases
+
+    # First four phases
     for i, feat in enumerate(steeping_features[:4]):
         with cols[i % 2]:
             inputs[feat] = st.number_input(f"{feat}", value=0.0)
 
-    # Compute Steeping Duration automatically
+    # Auto-calculate Steeping Duration INSIDE this section
     inputs['Steeping Duration'] = (
         inputs['first wet phase']
         + inputs['first dry phase']
@@ -82,7 +96,7 @@ with st.expander("Steeping Features", expanded=False):
             disabled=True
         )
 
-    # Continue with the rest
+    # Remaining features
     for feat in steeping_features[5:]:
         with cols[steeping_features.index(feat) % 2]:
             inputs[feat] = st.number_input(f"{feat}", value=0.0)
@@ -97,25 +111,10 @@ with st.expander("Germination Features", expanded=False):
             inputs[feat] = st.number_input(f"{feat}", value=0.0)
 
 # -----------------------------
-# Auto-calculate Water Sensity
-# -----------------------------
-inputs['water Sensity '] = (
-    inputs['Germination Energy '] - inputs['Germination Energy 8mls']
-)
-
-with st.columns(2)[0]:
-    st.number_input(
-        "Water Sensity (calculated)",
-        value=float(inputs['water Sensity ']),
-        disabled=True
-    )
-
-# -----------------------------
 # Prediction
 # -----------------------------
 if st.button("Predict Friability"):
     try:
-        # add missing calculated fields into dataframe
         input_df = pd.DataFrame([inputs], columns=columns)
         prediction = model.predict(input_df)
         st.success(f"Predicted Malt Friability: **{prediction[0]:.2f}**")
