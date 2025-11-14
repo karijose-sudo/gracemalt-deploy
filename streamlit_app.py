@@ -17,18 +17,18 @@ st.title("Grace Malt Friability Predictor")
 st.write("Enter your malt batch parameters below to predict **friability**.")
 
 # -----------------------------
-# Manual single batch input
+# Feature Lists
 # -----------------------------
 pre_steep_features = [
     'Grain Germinatio %', 'Germination Capacity', 'Germination Energy ',
     'Germination Energy 8mls', 'water Sensity ', 'Screens - eaml',
     '1000 corn Weight *c wgt', 'Grain Nitrogen % N2', 'Rubbish %',
-    'Moisture Content' 
+    'Moisture Content'
 ]
 
 steeping_features = [
     'first wet phase', 'first dry phase', 'second wet phase', 'second dry phase',
-    'Steeping Duration',  # ← stays here
+    'Steeping Duration',
     '1st wet steep water temp ', '2nd wet water temp  ',
     'End of Steep Mositure  Content ', 'Hydration Index based on 50 Grains ',
     'End of steep Chit Count)'
@@ -53,16 +53,17 @@ inputs = {}
 with st.expander("Pre-Steep Features", expanded=True):
     cols = st.columns(2)
     for i, feat in enumerate(pre_steep_features):
-        with cols[i % 2]:
-            if feat not in ['water Sensity ']:
+        if feat != 'water Sensity ':
+            with cols[i % 2]:
                 inputs[feat] = st.number_input(f"{feat}", value=0.0)
 
-    # Auto-calculate water sensity INSIDE the Pre-Steep section
+    # --- FIX #2: Correct calculated feature stored under exact model name ---
     inputs['water Sensity '] = (
         inputs.get('Germination Energy ', 0)
         - inputs.get('Germination Energy 8mls', 0)
     )
 
+    # Display to the user but DO NOT create new incorrect column names
     with st.columns(2)[0]:
         st.number_input(
             "water Sensity (calculated)",
@@ -81,14 +82,15 @@ with st.expander("Steeping Features", expanded=False):
         with cols[i % 2]:
             inputs[feat] = st.number_input(f"{feat}", value=0.0)
 
-    # Auto-calculate Steeping Duration INSIDE this section
+    # --- FIX #2: Calculate under exact feature name expected by model ---
     inputs['Steeping Duration'] = (
-        inputs['first wet phase']
-        + inputs['first dry phase']
-        + inputs['second wet phase']
-        + inputs['second dry phase']
+        inputs.get('first wet phase', 0)
+        + inputs.get('first dry phase', 0)
+        + inputs.get('second wet phase', 0)
+        + inputs.get('second dry phase', 0)
     )
 
+    # Display to user only
     with st.columns(2)[0]:
         st.number_input(
             "Steeping Duration (calculated)",
@@ -96,7 +98,7 @@ with st.expander("Steeping Features", expanded=False):
             disabled=True
         )
 
-    # Remaining features
+    # Remaining steeping inputs
     for feat in steeping_features[5:]:
         with cols[steeping_features.index(feat) % 2]:
             inputs[feat] = st.number_input(f"{feat}", value=0.0)
@@ -118,14 +120,13 @@ if st.button("Predict Friability"):
         # Build DataFrame
         input_df = pd.DataFrame([inputs], columns=columns)
 
-        # Ensure numeric and fill any NaNs
+        # Clean numeric types
         input_df = input_df.apply(pd.to_numeric, errors='coerce')
-        input_df = input_df.fillna(input_df.mean())  # fill missing values with column mean
+        input_df = input_df.fillna(input_df.mean())  # safety impute
 
         # Predict
         prediction = model.predict(input_df)
         st.success(f"Predicted Malt Friability: **{prediction[0]:.2f}**")
+
     except Exception as e:
         st.error(f"An error occurred during prediction: {e}")
-
-
