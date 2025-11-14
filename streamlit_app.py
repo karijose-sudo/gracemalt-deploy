@@ -27,10 +27,15 @@ pre_steep_features = [
 ]
 
 steeping_features = [
-    'first wet phase', 'first dry phase', 'second wet phase', 'second dry phase',
+     'first wet phase', 
+    'first dry phase', 
+    'second wet phase', 
+    'second dry phase',
     'Steeping Duration',
-    '1st wet steep water temp ', '2nd wet water temp  ',
-    'End of Steep Mositure  Content ', 'Hydration Index based on 50 Grains ',
+    'First wet steep water temp ',
+    'Second wet water temp  ',
+    'End of Steep Mositure  Content ', 
+    'Hydration Index based on 50 Grains ',
     'End of steep Chit Count)'
 ]
 
@@ -130,3 +135,4 @@ if st.button("Predict Friability"):
 
     except Exception as e:
         st.error(f"An error occurred during prediction: {e}")
+
