@@ -21,9 +21,9 @@ st.write("Enter your malt batch parameters below to predict **friability**.")
 # -----------------------------
 pre_steep_features = [
     'Grain Germinatio %', 'Germination Capacity', 'Germination Energy ',
-    'Germination Energy 8mls', 'Screens - eaml',
+    'Germination Energy 8mls', 'water Sensity ', 'Screens - eaml',
     '1000 corn Weight *c wgt', 'Grain Nitrogen % N2', 'Rubbish %',
-    'Moisture Content', 'water Sensity '  # ← moved here
+    'Moisture Content' 
 ]
 
 steeping_features = [
@@ -127,4 +127,5 @@ if st.button("Predict Friability"):
         st.success(f"Predicted Malt Friability: **{prediction[0]:.2f}**")
     except Exception as e:
         st.error(f"An error occurred during prediction: {e}")
+
 
