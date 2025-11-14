@@ -120,3 +120,4 @@ if st.button("Predict Friability"):
         st.success(f"Predicted Malt Friability: **{prediction[0]:.2f}**")
     except Exception as e:
         st.error(f"An error occurred during prediction: {e}")
+
