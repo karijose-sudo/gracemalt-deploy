@@ -2,7 +2,7 @@ import joblib
 import pandas as pd
 import os
 
-MODEL_PATH = os.path.join("models", "gracemalt_model.pkl")
+MODEL_PATH = os.path.join("models/ensemble_gracemalt.pkl")
 COLUMNS_PATH = os.path.join("models", "train_columns.pkl")
 
 gracemalt_model = joblib.load(MODEL_PATH)
@@ -17,3 +17,4 @@ def predict_quality(data: pd.DataFrame):
     aligned = align_features(data)
     preds = gracemalt_model.predict(aligned)
     return preds.tolist()
+
