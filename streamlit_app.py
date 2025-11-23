@@ -5,7 +5,7 @@ import joblib
 # -------------------------
 # Load Model
 # -------------------------
-model = joblib.load("friability_model.pkl")
+model = joblib.load("models/ensemble_gracemalt.pkl")
 
 # -------------------------
 # Minimum Allowed Values
@@ -93,3 +93,4 @@ if st.button("Predict Friability"):
             "⚠️ Because one or more values were below training minimums, "
             "treat this prediction with caution."
         )
+
