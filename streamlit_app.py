@@ -51,7 +51,7 @@ min_values = {
 'Chit Count  120hrs Post casting (3/4 to Full (F) in GBK': 21.0,
 'Chit Count  120hrs Post casting (Full Plus F+) in GBK': 1.0,
 'End of germination  Moisture ': 34.2
-```
+
 
 }
 
@@ -204,4 +204,5 @@ st.success(f"Predicted Friability: **{pred[0]:.2f}**")
 except Exception as e:
     st.error(f"An error occurred during prediction: {e}")
 ```
+
 
