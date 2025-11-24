@@ -34,7 +34,7 @@ min_values = {
 'Rubbish %': 0.1,
 'Moisture Content': 10.7,
 
-```
+
 'First wet steep water temp ': 10.0,
 'Second wet water temp  ': 9.0,
 'End of Steep Mositure  Content ': 38.0,
@@ -204,3 +204,4 @@ st.success(f"Predicted Friability: **{pred[0]:.2f}**")
 except Exception as e:
     st.error(f"An error occurred during prediction: {e}")
 ```
+
