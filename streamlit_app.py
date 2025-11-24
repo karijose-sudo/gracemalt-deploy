@@ -57,15 +57,9 @@ pre_steep_features = [
 ]
 
 steeping_features = [
-    'first wet phase',
-    'first dry phase',
-    'second wet phase',
-    'second dry phase',
-    'Steeping Duration',
-    'First wet steep water temp ',
-    'Second wet water temp  ',
-    'End of Steep Mositure  Content ',
-    'Hydration Index based on 50 Grains ',
+    'first wet phase', 'first dry phase', 'second wet phase', 'second dry phase',
+    'Steeping Duration', 'First wet steep water temp ', 'Second wet water temp  ',
+    'End of Steep Mositure  Content ', 'Hydration Index based on 50 Grains ',
     'End of steep Chit Count)'
 ]
 
@@ -86,13 +80,15 @@ inputs = {}
 # Function to input a feature with min validation
 # ----------------------------------------------
 
-def validated_number_input(label, default=0.0):
-    val = st.number_input(label, value=default)
-    min_val = min_values.get(label, None)
-    if min_val is not None and val < min_val:
+def validated_number_input(label):
+    """Show number input defaulted slightly above minimum; warn only if below minimum."""
+    min_val = min_values.get(label, 0.0)
+    default_val = min_val + 1  # slightly above minimum
+    val = st.number_input(label, value=default_val)
+    if val < min_val:
         st.warning(
             f"⚠️ {label} is below typical operating minimum ({min_val}). "
-            f"Prediction may be inaccurate."
+            "Prediction may be inaccurate."
         )
     return val
 
@@ -105,7 +101,7 @@ with st.expander("Pre-Steep Features", expanded=True):
     for i, feat in enumerate(pre_steep_features):
         if feat != 'water Sensity ':
             with cols[i % 2]:
-                inputs[feat] = validated_number_input(feat, 0.0)
+                inputs[feat] = validated_number_input(feat)
 
     # Auto-calc water sensity
     inputs['water Sensity '] = (
@@ -129,7 +125,7 @@ with st.expander("Steeping Features", expanded=False):
     # First four durations
     for i, feat in enumerate(steeping_features[:4]):
         with cols[i % 2]:
-            inputs[feat] = validated_number_input(feat, 0.0)
+            inputs[feat] = validated_number_input(feat)
 
     # Auto-calc duration
     inputs['Steeping Duration'] = (
@@ -148,7 +144,7 @@ with st.expander("Steeping Features", expanded=False):
     # Remaining steeping features
     for feat in steeping_features[5:]:
         with cols[steeping_features.index(feat) % 2]:
-            inputs[feat] = validated_number_input(feat, 0.0)
+            inputs[feat] = validated_number_input(feat)
 
 # ----------------------------------------------
 # GERMINATION SECTION UI
@@ -158,7 +154,7 @@ with st.expander("Germination Features", expanded=False):
     cols = st.columns(2)
     for i, feat in enumerate(germination_features):
         with cols[i % 2]:
-            inputs[feat] = validated_number_input(feat, 0.0)
+            inputs[feat] = validated_number_input(feat)
 
 # ----------------------------------------------
 # PREDICTION
